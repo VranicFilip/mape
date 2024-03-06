@@ -1,6 +1,3 @@
 Listing listeners
-[Host: 195.252.88.215] [IP: 195.252.88.215] [User: vranic] [Mountpoint: /SOMB] [Id: 327] [Connected for: 5 seconds] [Bytes written: 3056] [Errors: 0] [User agent: NTRIP LefebureAndroidManNTRIPClient/20211203] [Type: http client] [Pos: 44.770000 17.210000] [Sol: 1]
-[Host: 195.252.88.215] [IP: 195.252.88.215] [User: pera] [Mountpoint: /BGBJ] [Id: 327] [Connected for: 5 seconds] [Bytes written: 3056] [Errors: 0] [User agent: NTRIP LefebureAndroidManNTRIPClient/20211203] [Type: http client] [Pos: 44.8125 20.4612] [Sol: 1]
-[Host: 195.252.88.215] [IP: 195.252.88.215] [User: mika] [Mountpoint: /NISC] [Id: 327] [Connected for: 5 seconds] [Bytes written: 3056] [Errors: 0] [User agent: NTRIP LefebureAndroidManNTRIPClient/20211203] [Type: http client] [Pos: 43.3209 21.8954] [Sol: 1]
+[Host: 195.252.88.215] [IP: 195.252.88.215] [User: vranic] [Mountpoint: /SOMB] [Id: 335] [Connected for: 3 seconds] [Bytes written: 3200] [Errors: 0] [User agent: NTRIP LefebureAndroidManNTRIPClient/20211203] [Type: http client] [Pos: 44.770000 17.210000] [Sol: 1]
 End of listener listing
-
