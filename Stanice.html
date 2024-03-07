@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leaflet Mapa</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <style>
+        body { margin: 0; }
+        #map { height: 100vh; }
+    </style>
+</head>
+<body>
+
+<div id="map"></div>
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script>
+
+    var map = L.map('map').setView([44.7872, 20.4573], 7);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+
+    function dodajMarker(lat, lon, naziv, ikonaUrl) {
+        var ikona = L.icon({
+            iconUrl: ikonaUrl,
+            iconSize: [30, 30], // Prilagodite veličinu ikone prema potrebi
+            iconAnchor: [15, 30],
+            popupAnchor: [0, -30]
+        });
+
+        var marker = L.marker([lat, lon], {
+            icon: ikona
+        }).addTo(map)
+            .bindPopup(naziv);
+    }
+
+    fetch('https://raw.githubusercontent.com/VranicFilip/mape/main/stanice.txt')
+        .then(response => response.text())
+        .then(data => {
+            var linije = data.split('\n');
+            linije.forEach(linija => {
+                var podaci = linija.split(':');
+                if (podaci.length === 2) {
+                    var naziv = podaci[0].substring(1);
+                    var koordinate = podaci[1].split(',');
+                    var lat = parseFloat(koordinate[0]);
+                    var lon = parseFloat(koordinate[1]);
+
+                    // URL adresa za ikonu
+                    var ikonaUrl = 'https://cdn2.iconfinder.com/data/icons/snipicons/500/antenna-512.png';
+
+                    dodajMarker(lat, lon, naziv, ikonaUrl);
+                }
+            });
+        })
+        .catch(error => console.error('Greška pri učitavanju podataka:', error));
+
+</script>
+
+</body>
+</html>
+
