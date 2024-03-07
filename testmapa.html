@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leaflet Map</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <style>
+        body, html {
+            height: 100%;
+            margin: 0;
+        }
+
+        #map {
+            height: 100%;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+
+<div id="map"></div>
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script>
+    var map = L.map('map').setView([44.0, 20.9], 7);
+    var markers = {}; // Čuvanje referenci ka markerima
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+
+    // Periodičko osvežavanje svakih 1 sekunde (prepravljeno)
+    setInterval(function () {
+        fetch('https://api.github.com/repos/VranicFilip/mape/contents/lokacije.txt')
+            .then(response => response.json())
+            .then(data => {
+                // Dekodiranje Base64 sadržaja
+                var content = atob(data.content);
+                
+                var lines = content.split('\n').filter(line => line.trim() !== '');
+
+                lines.forEach(line => {
+                    var markerData = {};
+
+                    // Razbijanje linije na ključeve i vrednosti
+                    var keyValuePairs = line.match(/\[([^:]+): ([^\]]+)\]/g);
+
+                    if (keyValuePairs) {
+                        keyValuePairs.forEach(pair => {
+                            var match = pair.match(/\[([^:]+): ([^\]]+)\]/);
+                            if (match) {
+                                var key = match[1].trim();
+                                var value = match[2].trim();
+                                markerData[key] = value;
+                            }
+                        });
+
+                        // Dobijanje koordinata (lat, lng) iz podataka
+                        var posMatch = line.match(/\[Pos: ([^\]]+)\]/);
+                        if (posMatch) {
+                            var pos = posMatch[1].split(' ');
+                            var lat = parseFloat(pos[0]);
+                            var lng = parseFloat(pos[1]);
+
+                            // Ažuriranje postojećeg markera ili kreiranje novog
+                            var solValue = markerData['Sol'];
+                            var iconUrl = getIconUrl(solValue);
+
+                            if (markers[lat + '-' + lng]) {
+                                // Ažuriranje postojećeg markera
+                                markers[lat + '-' + lng].setIcon(L.icon({ iconUrl: iconUrl, iconSize: [30, 30], iconAnchor: [15, 30] }));
+                                markers[lat + '-' + lng].bindPopup(generatePopupContent(markerData)).update();
+                            } else {
+                                // Kreiranje novog markera
+                                markers[lat + '-' + lng] = L.marker([lat, lng], { icon: L.icon({ iconUrl: iconUrl, iconSize: [30, 30], iconAnchor: [15, 30] }) })
+                                    .bindPopup(generatePopupContent(markerData))
+                                    .addTo(map);
+                            }
+                        }
+                    }
+                });
+            })
+            .catch(error => console.error('Error fetching data from GitHub API:', error));
+    }, 1000); // Osvežavanje svakih 1 sekunde (prepravljeno)
+
+    // Funkcija za dobijanje URL-a ikonice na osnovu vrednosti 'Sol'
+    function getIconUrl(solValue) {
+        switch (solValue) {
+            case '1':
+                return 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-blue.png';
+            case '2':
+                return 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-gold.png';
+            case '3':
+                return 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png';
+            case '4':
+                return 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-green.png';
+            default:
+                return 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-black.png';
+        }
+    }
+
+    // Funkcija za generisanje sadržaja pop-up prozora
+    function generatePopupContent(markerData) {
+        var popupContent = '<div>';
+        Object.keys(markerData).forEach(key => {
+            popupContent += '<b>' + key + ':</b> ' + markerData[key] + '<br>';
+        });
+        popupContent += '</div>';
+        return popupContent;
+    }
+</script>
+
+</body>
+</html>
